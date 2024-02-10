@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	snowflakes := make([][]int, 0, 100000)
+	snowflakes := map[int][][]int{}
 
 	reader := bufio.NewReader(os.Stdin)
 	line, _ := reader.ReadString('\r')
@@ -24,23 +24,41 @@ func main() {
 				snowflake = append(snowflake, nb)
 			}
 		}
-		snowflakes = append(snowflakes, snowflake)
+		key := hashKey(snowflake)
+		if _, ok := snowflakes[key]; !ok {
+			snowflakes[key] = [][]int{snowflake}
+		} else {
+			snowflakes[key] = append(snowflakes[key], snowflake)
+		}
 	}
-
-	identifyIdentical(snowflakes, len(snowflakes))
+	fmt.Println(snowflakes)
+	found := false
+	for _, itms := range snowflakes {
+		if len(itms) > 1 {
+			found = identifyIdentical(itms, len(itms))
+		}
+	}
+	if found {
+		fmt.Println("Twin snowflakes found.")
+	} else {
+		fmt.Println("No two snowflakes are alike.")
+	}
 }
 
-func identifyIdentical(a [][]int, n int) {
+func hashKey(snowflake []int) int {
+	return (snowflake[0] + snowflake[1] + snowflake[2] + snowflake[3] + snowflake[4] + snowflake[5]) % 100000
+}
+
+func identifyIdentical(a [][]int, n int) bool {
 	var i, j int
 	for i = 0; i < n; i++ {
 		for j = i + 1; j < n; j++ {
 			if identicalRight(a[i], a[j]) || identicalLeft(a[i], a[j]) {
-				fmt.Println("Twin snowflakes found.")
-				return
+				return true
 			}
 		}
 	}
-	fmt.Println("No two snowflakes are alike.")
+	return false
 }
 
 func identicalRight(first, second []int) bool {
