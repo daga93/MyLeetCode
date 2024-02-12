@@ -17,9 +17,10 @@ func main() {
 
 	for i := 0; i < c; i++ {
 		line, _ := reader.ReadString('\r')
-		curLine := strings.Replace(line, "\r", "", -1)
+		curLine := strings.Replace(line, "\n", "", -1)
+		curLine = strings.Replace(curLine, "\r", "", -1)
 		snowflake := make([]int, 0, 6)
-		for _, r := range curLine {
+		for _, r := range strings.Split(curLine, " ") {
 			if nb, err := strconv.Atoi(string(r)); err == nil {
 				snowflake = append(snowflake, nb)
 			}
